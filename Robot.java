@@ -11,7 +11,8 @@ class Robot {
   public Robot() {
     // check connections are correct!
     //set up the robot
-    pilot = new DifferentialPilot(5.0, 17.5, Motor.A, Motor.C);
+    pilot = new DifferentialPilot(5.0, 16.2, Motor.A, Motor.C);
+    //pilot.setRotateSpeed(0.5);
     //set up the navigator
     navbot = new Navigator(pilot);
     //set up light sensor
@@ -19,6 +20,10 @@ class Robot {
     leftLight = new LightSensor(SensorPort.S4);
     //set up sonar sensor
     sonar = new UltrasonicSensor(SensorPort.S3);
+  }
+
+  public void moveForward(double distance) {
+    this.pilot.travel(distance);
   }
   
   public void moveTo(Node n) {
@@ -32,6 +37,10 @@ class Robot {
 
   public double getSonarDistance() {
 	return this.sonar.getDistance();
+  }
+
+  public void makeRotate(double angle) {
+	this.pilot.rotate(angle);
   }
   
 }
