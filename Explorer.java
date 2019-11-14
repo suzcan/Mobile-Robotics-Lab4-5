@@ -8,17 +8,17 @@ import lejos.robotics.navigation.*;
 public class Explorer {
   public static void main(String[] args) {
     Robot robo = new Robot();
-    Node A = new Node("A", 0, 0);
+    Node A = new Node("A", 0, 0, "corner");
     boolean atEnd = false;
-    
+
     Stack<Node> stack = new Stack<Node>();
     stack.push(A);
 
     int white = 45;
     double angle = 90.0;
-    
-    ArrayList<Node> toExplore;
-    ArrayList<Node> explored;
+
+    ArrayList<Node> toExplore = new ArrayList<Node>();
+    ArrayList<Node> explored = new ArrayList<Node>();
 
     Node prev = A;
     int xpos = 0;
@@ -29,38 +29,55 @@ public class Explorer {
     while(atEnd && (toExplore.length == explored.length)) {
       // variables for DFS
       nodeName++;
-      if (yinc) 
-	ypos += 2; 
-      else 
+      if (yinc) {
+	     ypos += 2;
+     } else {
         xpos += 2;
+      }
 
       boolean rDetect, lDetect = false;
       double counter = 0.0;
-      double[] lightArr = robo.getLightValue();
 
+      // ultrasonic sensor for obstacles
+
+      double[] lightArr = robo.getLightValue();
       double r = lightArr[0];
       double l = lightArr[1];
 
       if(l >= white && r >= white) {
         robo.moveForward(2.0);
       } else if (l <= white && r >= white) {
-        Node B = new Node(nodeName.toString(), xpos, ypos);
-        B.pred = A;
+        // TODO
+        /* with adjusting included
+        while(counter < angle / 5) {
+          robo.makeRotate(5.0);
+           if(r <= white)  {
+            rDetect = true;
+            SET TYPE OF NODE TO JUNCTION ELSE CORNER
+            SET THEIR EXPLORED COUNTER TO 1
+          }
+            counter++;
+           }
+        */
+
+        Node B = new Node(nodeName.toString(), xpos, ypos, "junction");
+        B.pred = prev;
         stack.add(B);
-	prev = B;
+	      prev = B;
         yinc = !yinc;
         robo.makeRotate(90.0);
-        /* with adjusting included
-        while(counter < angle) {
-          robo.makeRotate(5.0); 
-	  if(r <= white) rDetect = true;
-	  counter++;   
-	}
-        */
+
       } else if (l >= white && r <= white) {
-	robo.makeRotate(-90.0);
+        // TODO
+        // mirror previous if statement but with *-1 angles
+        // junction behaviour
+	       robo.makeRotate(90.0);
       } else if (l <= white && r <= white) {
-	robo.makeRotate(90.0);
+        // £££££££££££££££££££££ USE NAVIGATOR CLASS TO GET CURRENT COORDINATES £££££££££££££££££££££
+        // TODO
+        // add crossroad
+        // crossroad behaviour
+        robo.makeRotate(-90.0);
       } else {
   	// anything else
       }

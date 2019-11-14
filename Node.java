@@ -6,14 +6,22 @@ class Node {
     public Boolean explored = false; //whether node has been explored
     public ArrayList<Node> children = new ArrayList<>(); //stores children
     public int xPos, yPos; //coordinates of the node in cartesian space
+    public String type; // type of intersection either: corner, crossroads, junction
+    public int exploredCounter; // this represents node connections that have been explored, not necessarily children
 
     //constructor
-    public Node(String name, int xPos, int yPos) {
+    public Node(String name, int xPos, int yPos, String type, int exploredCounter) {
         this.name = name;
         this.xPos = xPos;
         this.yPos = yPos;
         this.explored = false;
         this.children = new ArrayList<Node>();
+        this.type = type;
+        this.exploredCounter = exploredCounter;
+    }
+
+    public String getType() {
+      return this.type;
     }
 
     public String toString(){
@@ -33,8 +41,20 @@ class Node {
 	}
 	return null;
     }
-    
+
     public Boolean equals(Node n) {
 	return (n.name == this.name) ? true : false;
+    }
+
+    public void setType(String type) {
+      this.type = type;
+    }
+
+    public int getExploredCount() {
+      return this.exploredCounter;
+    }
+
+    public void setExploredCount(int exploredCounter) {
+      this.exploredCounter = exploredCounter;
     }
 }
