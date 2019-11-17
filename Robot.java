@@ -7,6 +7,7 @@ class Robot {
   private LightSensor rightLight;
   private LightSensor leftLight;
   private UltrasonicSensor sonar;
+  public Pose pose;
 
   public Robot() {
     // check connections are correct!
@@ -20,6 +21,8 @@ class Robot {
     leftLight = new LightSensor(SensorPort.S4);
     //set up sonar sensor
     sonar = new UltrasonicSensor(SensorPort.S3);
+    
+    pose = new Pose();
   }
 
   public void moveForward(double distance) {
@@ -32,15 +35,19 @@ class Robot {
   }
 
   public double[] getLightValue() {
-	return new double[] {this.rightLight.getLightValue(), this.leftLight.getLightValue()};
+	  return new double[] {this.rightLight.getLightValue(), this.leftLight.getLightValue()};
   }
 
   public double getSonarDistance() {
-	return this.sonar.getDistance();
+	  return this.sonar.getDistance();
   }
 
   public void makeRotate(double angle) {
-	this.pilot.rotate(angle);
+	  this.pilot.rotate(angle);
+  }
+
+  public float[] getPose() {
+    return new float[] = {pose.getX, pose.getY};
   }
   
 }

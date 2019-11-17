@@ -8,63 +8,110 @@ import lejos.robotics.navigation.*;
 public class Explorer {
   public static void main(String[] args) {
     Robot robo = new Robot();
-    Node A = new Node("A", 0, 0);
-    boolean atEnd = false;
+    int nodeCounter = 1;
+    Node startingPoint = new Node("1", 0, 0);
     
     Stack<Node> stack = new Stack<Node>();
-    stack.push(A);
+    stack.push(startingPoint);
 
-    int white = 45;
+    ArrayList<Node> toExplore = new ArrayList<Node>();
+    ArrayList<Node> explored = new ArrayList<Node>();
+    
+    int darkColourThreshold = 45;
     double angle = 90.0;
     
-    ArrayList<Node> toExplore;
-    ArrayList<Node> explored;
-
-    Node prev = A;
-    int xpos = 0;
-    int ypos = 0;
-    boolean yinc = true;
-    int nodeName = 0;
-
-    while(atEnd && (toExplore.length == explored.length)) {
+    while(toExplore.size() == explored.size()) {
       // variables for DFS
-      nodeName++;
-      if (yinc) 
-	ypos += 2; 
-      else 
-        xpos += 2;
-
-      boolean rDetect, lDetect = false;
-      double counter = 0.0;
       double[] lightArr = robo.getLightValue();
-
       double r = lightArr[0];
       double l = lightArr[1];
 
-      if(l >= white && r >= white) {
+      boolean rDetect, lDetect = false;
+      double counter = 0.0;
+      
+      if(l >= darkColourThreshold && r >= darkColourThreshold) {
+        // move forward on straight line
         robo.moveForward(2.0);
-      } else if (l <= white && r >= white) {
-        Node B = new Node(nodeName.toString(), xpos, ypos);
-        B.pred = A;
-        stack.add(B);
-	prev = B;
-        yinc = !yinc;
-        robo.makeRotate(90.0);
-        /* with adjusting included
-        while(counter < angle) {
-          robo.makeRotate(5.0); 
-	  if(r <= white) rDetect = true;
-	  counter++;   
-	}
-        */
-      } else if (l >= white && r <= white) {
-	robo.makeRotate(-90.0);
-      } else if (l <= white && r <= white) {
-	robo.makeRotate(90.0);
+      } else if (l <= darkColourThreshold && r >= darkColourThreshold) {
+        // TODO: adjust for sonar 
+        int rotateCount = 0;
+        while (r < darkColourThreshold) {
+          rotateCount++;
+          robo.makeRotate(1.0); // might be too small
+          r = robo.getLightValue()[0]; // get new value
+        }
+        if(rotateCount <= 15) {
+          // just adjust
+          robo.makeRotate(-4.0);
+        } else if (rotateCount >= 90) {
+          // corner
+          String name = Integer.toString(++nodeCounter);
+          int x = (int) robo.pose.getX();
+          int y = (int) robo.pose.getY();
+          
+          Node newNode = new Node(name, x, y);
+          newNode.childrenCount = 1;
+          newNode.pred = stack.peek();
+          newNode.pred.exploredChildrenCounter++;
+          stack.push(newNode);
+        } else {
+          // junction
+          String name = Integer.toString(++nodeCounter);
+          int x = (int) robo.pose.getX();
+          int y = (int) robo.pose.getY();
+          
+          Node newNode = new Node(name, x, y);
+          newNode.childrenCount = 2;
+          newNode.pred = stack.peek();
+          newNode.pred.exploredChildrenCounter++;
+          stack.push(newNode);
+        }
+      } else if (l >= darkColourThreshold && r <= darkColourThreshold) {
+        // TODO: adjust for sonar 
+        int rotateCount = 0;
+        while (l < darkColourThreshold) {
+          rotateCount++;
+          robo.makeRotate(1.0); // might be too small
+          l = robo.getLightValue()[1]; // get new value
+        }
+        if(rotateCount <= 15) {
+          // just adjust
+          robo.makeRotate(4.0);
+        } else if (rotateCount >= 90) {
+          // corner
+          String name = Integer.toString(++nodeCounter);
+          int x = (int) robo.pose.getX();
+          int y = (int) robo.pose.getY();
+          
+          Node newNode = new Node(name, x, y);
+          newNode.childrenCount = 1;
+          newNode.pred = stack.peek();
+          newNode.pred.exploredChildrenCounter++;
+          stack.push(newNode);
+        } else {
+          // junction
+          String name = Integer.toString(++nodeCounter);
+          int x = (int) robo.pose.getX();
+          int y = (int) robo.pose.getY();
+          
+          Node newNode = new Node(name, x, y);
+          newNode.childrenCount = 2;
+          newNode.pred = stack.peek();
+          newNode.pred.exploredChildrenCounter++;
+          stack.push(newNode);
+        }
+      } else if (l <= darkColourThreshold && r <= darkColourThreshold) {
+        String name = Integer.toString(++nodeCounter);
+        int x = (int) robo.pose.getX();
+        int y = (int) robo.pose.getY();
+        Node newNode = new Node(name, x, y);
+        newNode.childrenCount = 4;
+        newNode.pred = stack.peek();
+        newNode.pred.exploredChildrenCount++;
+        stack.push(newNode);
       } else {
-  	// anything else
+        System.out.println("Unknown case");
       }
-   }
-
+    }
   }
 }

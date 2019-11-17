@@ -6,6 +6,8 @@ class Node {
     public Boolean explored = false; //whether node has been explored
     public ArrayList<Node> children = new ArrayList<>(); //stores children
     public int xPos, yPos; //coordinates of the node in cartesian space
+    public int childrenCount = 0;
+    public int exploredChildrenCount = 0;
 
     //constructor
     public Node(String name, int xPos, int yPos) {
@@ -26,15 +28,15 @@ class Node {
     }
 
     public Node getChild() {
-	for(int i = 0; i < children.size(); i++) {
-	    if(!children.get(i).explored) {
-		return children.get(i);
+	    for(int i = 0; i < children.size(); i++) {
+	        if(!children.get(i).explored) {
+	    	    return children.get(i);
+	        }
 	    }
-	}
-	return null;
+	    return null;
     }
     
     public Boolean equals(Node n) {
-	return (n.name == this.name) ? true : false;
+	    return (n.name == this.name) ? true : false;
     }
 }
