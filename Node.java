@@ -6,13 +6,8 @@ class Node {
     public Boolean explored = false; //whether node has been explored
     public ArrayList<Node> children = new ArrayList<>(); //stores children
     public int xPos, yPos; //coordinates of the node in cartesian space
-<<<<<<< HEAD
-    public String type; // type of intersection either: corner, crossroads, junction
-    public int exploredCounter; // this represents node connections that have been explored, not necessarily children
-=======
     public int childrenCount = 0;
     public int exploredChildrenCount = 0;
->>>>>>> 74cec91e96a2a9e7061dd3a9c4281835ba519872
 
     //constructor
     public Node(String name, int xPos, int yPos, String type, int exploredCounter) {

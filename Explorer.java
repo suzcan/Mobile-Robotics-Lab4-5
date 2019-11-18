@@ -1,107 +1,48 @@
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Stack;
+import java.util.Set;
 
 import lejos.nxt.*;
 import lejos.robotics.navigation.*;
 
 public class Explorer {
-  
+
   public static void main(String[] args) {
     Robot robo = new Robot();
-<<<<<<< HEAD
-    Node A = new Node("A", 0, 0, "corner");
-    boolean atEnd = false;
-=======
     int nodeCounter = 1;
     Node startingPoint = new Node("1", 0, 0);
     startingPoint.childrenCount = 1;
     startingPoint.pred.exploredChildrenCount++;
->>>>>>> 74cec91e96a2a9e7061dd3a9c4281835ba519872
 
+    Stack<String> moves = new Stack<String>();
     Stack<Node> stack = new Stack<Node>();
     stack.push(startingPoint);
 
-<<<<<<< HEAD
-    int white = 45;
-    double angle = 90.0;
-
-    ArrayList<Node> toExplore = new ArrayList<Node>();
-    ArrayList<Node> explored = new ArrayList<Node>();
-=======
+    Node predecessor = startingPoint;
     ArrayList<Node> toExplore = new ArrayList<Node>();
     ArrayList<Node> explored = new ArrayList<Node>();
     toExplore.add(startingPoint);
     explored.add(startingPoint);
->>>>>>> 74cec91e96a2a9e7061dd3a9c4281835ba519872
 
     int darkColourThreshold = 45;
     double angle = 90.0;
 
     do {
       // variables for DFS
-<<<<<<< HEAD
-      nodeName++;
-      if (yinc) {
-	     ypos += 2;
-     } else {
-        xpos += 2;
-      }
-
-      boolean rDetect, lDetect = false;
-      double counter = 0.0;
-
-      // ultrasonic sensor for obstacles
-
-=======
->>>>>>> 74cec91e96a2a9e7061dd3a9c4281835ba519872
       double[] lightArr = robo.getLightValue();
       double r = lightArr[0];
       double l = lightArr[1];
 
       boolean rDetect, lDetect = false;
       double counter = 0.0;
-      
+
       if(l >= darkColourThreshold && r >= darkColourThreshold) {
         // move forward on straight line
         robo.moveForward(2.0);
-<<<<<<< HEAD
-      } else if (l <= white && r >= white) {
-        // TODO
-        /* with adjusting included
-        while(counter < angle / 5) {
-          robo.makeRotate(5.0);
-           if(r <= white)  {
-            rDetect = true;
-            SET TYPE OF NODE TO JUNCTION ELSE CORNER
-            SET THEIR EXPLORED COUNTER TO 1
-          }
-            counter++;
-           }
-        */
-
-        Node B = new Node(nodeName.toString(), xpos, ypos, "junction");
-        B.pred = prev;
-        stack.add(B);
-	      prev = B;
-        yinc = !yinc;
-        robo.makeRotate(90.0);
-
-      } else if (l >= white && r <= white) {
-        // TODO
-        // mirror previous if statement but with *-1 angles
-        // junction behaviour
-	       robo.makeRotate(90.0);
-      } else if (l <= white && r <= white) {
-        // £££££££££££££££££££££ USE NAVIGATOR CLASS TO GET CURRENT COORDINATES £££££££££££££££££££££
-        // TODO
-        // add crossroad
-        // crossroad behaviour
-        robo.makeRotate(-90.0);
-=======
       } else if (l <= darkColourThreshold && r >= darkColourThreshold) {
         // Left sensor on tape
-        // TODO: adjust for sonar 
+        // TODO: adjust for sonar
         int rotateCount = 0;
         while (r < darkColourThreshold) {
           rotateCount++;
@@ -116,7 +57,7 @@ public class Explorer {
           int x = (int) robo.pose.getX();
           int y = (int) robo.pose.getY();
 
-          int index = previouslyVisited(toExplore, x, y);
+          int index = previouslyVisitedNode(toExplore, x, y);
 
           if(index == -1) { // not visited
             String name = Integer.toString(++nodeCounter);
@@ -132,7 +73,7 @@ public class Explorer {
 
             toExplore.add(newNode);
             explored.add(newNode);
-            
+
             // adjust to continue journey
           } else {
             Node oldNode = toExplore.get(index);
@@ -144,7 +85,7 @@ public class Explorer {
           int x = (int) robo.pose.getX();
           int y = (int) robo.pose.getY();
 
-          int index = previouslyVisited(toExplore, x, y);
+          int index = previouslyVisitedNode(toExplore, x, y);
 
           if(index == -1) {
             String name = Integer.toString(++nodeCounter);
@@ -168,7 +109,7 @@ public class Explorer {
         }
       } else if (l >= darkColourThreshold && r <= darkColourThreshold) {
         // right sensor on tape
-        // TODO: adjust for sonar 
+        // TODO: adjust for sonar
         int rotateCount = 0;
         while (l < darkColourThreshold) {
           rotateCount++;
@@ -183,7 +124,7 @@ public class Explorer {
           int x = (int) robo.pose.getX();
           int y = (int) robo.pose.getY();
 
-          int index = previouslyVisited(toExplore, x, y);
+          int index = previouslyVisitedNode(toExplore, x, y);
 
           if(index == -1) {
             String name = Integer.toString(++nodeCounter);
@@ -214,7 +155,7 @@ public class Explorer {
           int x = (int) robo.pose.getX();
           int y = (int) robo.pose.getY();
 
-          int index = previouslyVisited(toExplore, x, y);
+          int index = previouslyVisitedNode(toExplore, x, y);
 
           if(index == -1) {
              String name = Integer.toString(++nodeCounter);
@@ -230,7 +171,7 @@ public class Explorer {
             Node oldNode = toExplore.get(index);
             explored.add(oldNode);
             robo.makeRotate(180.0);
-          }        
+          }
         }
       } else if (l <= darkColourThreshold && r <= darkColourThreshold) {
         // both sensors on tape
@@ -246,7 +187,7 @@ public class Explorer {
           int x = (int) robo.pose.getX();
           int y = (int) robo.pose.getY();
 
-          int index = previouslyVisited(toExplore, x, y);
+          int index = previouslyVisitedNode(toExplore, x, y);
 
           if(index == -1) {
             String name = Integer.toString(++nodeCounter);
@@ -261,14 +202,37 @@ public class Explorer {
             stack.push(pred);
             stack.push(newNode);
           } else {
+            // choosing a unexplored path
+            Node oldNode = toExplore.get(index);
+            oldNode.exploredChildrenCount++;
 
+            if(oldNode.exploredChildrenCount => oldNode.childrenCount) {
+              explored.add(oldNode);
+              robo.makeRotate(180.0);
+              // backtrack
+            } else {
+              // find unexplored path
+              Set<double> visited = visited(visited);
+              double directions[] = {0.0, 90.0, 180.0, -90.0};
+              double unexplored = 0.0;
+              for(int i = 0; i < directions; i++) {
+                if(!visited.contains(directions[i])) {
+                  unexplored = directions[i];
+                  break;
+                }
+              }
+
+              // move to unexplored path
+              robo.pose.setHeading(unexplored);
+              
+            }
           }
         } else {
           // junction
           int x = (int) robo.pose.getX();
           int y = (int) robo.pose.getY();
 
-          int index = previouslyVisited(toExplore, x, y);
+          int index = previouslyVisitedNode(toExplore, x, y);
 
           if(index == -1) {
             String name = Integer.toString(++nodeCounter);
@@ -287,19 +251,37 @@ public class Explorer {
             robo.makeRotate(180.0);
           }
         }
->>>>>>> 74cec91e96a2a9e7061dd3a9c4281835ba519872
       } else {
         System.out.println("Unknown case");
       }
     } while (toExplore.size() == explored.size());
-  } 
+  }
 
-  static int previouslyVisited(ArrayList<Node> toExplore, int x, int y) {
+  static int previouslyVisitedNode(ArrayList<Node> toExplore, int x, int y) {
     for(int i = 0;  i < toExplore.size(); i++) {
       Node curr = toExplore.get(i);
       if(curr.xPos == x && curr.yPos == y) return i;
     }
     return -1;
   }
-}
 
+  static Set<double> visited(Node node) {
+    ArrayList<Node> neighbours = node.children;
+    neighbours.add(node.pred);
+    Set<double> explored = new Set<double>();
+    for(int i = 0; i < neighbours.size(); i++) {
+      Node neighbour = neighbours.get(i);
+      if(neighbour.xPos > node.xPos) {
+        explored.add(90.0); // left
+      } else if (neighbour.xPos < node.xPos) {
+        explored.add(-90.0); // right
+      } else if (neighbour.yPos > node.yPos) {
+        explored.add(0.0); // up
+      } else if (neighbour.yPos < node.yPos) {
+        explored.add(180.0); // down
+      }
+    }
+    return explored;
+  }
+
+}
