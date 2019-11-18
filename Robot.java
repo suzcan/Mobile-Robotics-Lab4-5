@@ -21,14 +21,18 @@ class Robot {
     leftLight = new LightSensor(SensorPort.S4);
     //set up sonar sensor
     sonar = new UltrasonicSensor(SensorPort.S3);
-    
+
     pose = new Pose();
   }
 
   public void moveForward(double distance) {
     this.pilot.travel(distance);
   }
-  
+
+  public void moveBackward(double distance) {
+    this.pilto.travel(distance*-1.0, true);
+  }
+
   public void moveTo(Node n) {
     this.navbot.goTo(n.xPos, n.yPos);
     this.navbot.waitForStop();
@@ -49,5 +53,5 @@ class Robot {
   public float[] getPose() {
     return new float[] = {pose.getX, pose.getY};
   }
-  
+
 }

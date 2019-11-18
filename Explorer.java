@@ -19,7 +19,7 @@ public class Explorer {
     Stack<Node> stack = new Stack<Node>();
     stack.push(startingPoint);
 
-    Node predecessor = startingPoint;
+    Node prev = startingPoint;
     ArrayList<Node> toExplore = new ArrayList<Node>();
     ArrayList<Node> explored = new ArrayList<Node>();
     toExplore.add(startingPoint);
@@ -40,6 +40,10 @@ public class Explorer {
       if(l >= darkColourThreshold && r >= darkColourThreshold) {
         // move forward on straight line
         robo.moveForward(2.0);
+        double sonarDis = robo.getSonarDistance();
+        if(sonarDis < 30) {
+          robo.moveTo(prev);
+        }
       } else if (l <= darkColourThreshold && r >= darkColourThreshold) {
         // Left sensor on tape
         // TODO: adjust for sonar
@@ -109,7 +113,6 @@ public class Explorer {
         }
       } else if (l >= darkColourThreshold && r <= darkColourThreshold) {
         // right sensor on tape
-        // TODO: adjust for sonar
         int rotateCount = 0;
         while (l < darkColourThreshold) {
           rotateCount++;
@@ -224,7 +227,7 @@ public class Explorer {
 
               // move to unexplored path
               robo.pose.setHeading(unexplored);
-              
+
             }
           }
         } else {
