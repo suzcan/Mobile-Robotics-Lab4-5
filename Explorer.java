@@ -1,7 +1,5 @@
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Stack;
-import java.util.Set;
 
 import lejos.nxt.*;
 import lejos.robotics.navigation.*;
@@ -21,12 +19,9 @@ public class Explorer {
 
     Node prev = startingPoint;
     ArrayList<Node> toExplore = new ArrayList<Node>();
-    ArrayList<Node> explored = new ArrayList<Node>();
     toExplore.add(startingPoint);
-    explored.add(startingPoint);
 
     int darkColourThreshold = 45;
-    double angle = 90.0;
 
     do {
       // variables for DFS
@@ -40,19 +35,21 @@ public class Explorer {
       if(l >= darkColourThreshold && r >= darkColourThreshold) {
         // move forward on straight line
         robo.moveForward(2.0);
-        double sonarDis = robo.getSonarDistance();
-        if(sonarDis < 30) {
+        if(robo.getSonarDistance() < 30) {
           robo.moveTo(prev);
         }
       } else if (l <= darkColourThreshold && r >= darkColourThreshold) {
         // Left sensor on tape
         // TODO: adjust for sonar
+        /*
         int rotateCount = 0;
         while (r < darkColourThreshold) {
           rotateCount++;
           robo.makeRotate(1.0); // might be too small
-          r = robo.getLightValue()[0]; // get new value
+          lightArr = robo.getLightValue();
+	        r = lightArr[0];
         }
+
         if(rotateCount <= 15) {
           // just adjust
           robo.makeRotate(-4.0);
@@ -76,12 +73,12 @@ public class Explorer {
             stack.push(newNode);
 
             toExplore.add(newNode);
-            explored.add(newNode);
 
             // adjust to continue journey
           } else {
             Node oldNode = toExplore.get(index);
-            explored.add(oldNode);
+            oldNode.exploredChildrenCount++;
+            toExplore.add(index, oldNode);
             robo.makeRotate(180.0);
           }
         } else {
@@ -107,18 +104,22 @@ public class Explorer {
             robo.moveForward(5.0);
           } else {
             Node oldNode = toExplore.get(index);
-            explored.add(oldNode);
+	          oldNode.exploredChildrenCount++;
+            toExplore.add(index, oldNode);
             robo.makeRotate(180.0);
           }
         }
+        */
       } else if (l >= darkColourThreshold && r <= darkColourThreshold) {
         // right sensor on tape
         int rotateCount = 0;
         while (l < darkColourThreshold) {
           rotateCount++;
           robo.makeRotate(1.0); // might be too small
-          l = robo.getLightValue()[1]; // get new value
+          lightArr = robo.getLightValue();
+	        l = lightArr[1];
         }
+        /*
         if(rotateCount <= 15) {
           // just adjust
           robo.makeRotate(4.0);
@@ -143,14 +144,14 @@ public class Explorer {
             stack.push(newNode);
 
             toExplore.add(newNode);
-            explored.add(newNode);
 
             // adjust to continue journey
             robo.makeRotate(-5.0);
             robo.moveForward(5.0);
           } else {
             Node oldNode = toExplore.get(index);
-            explored.add(oldNode);
+            oldNode.exploredChildrenCount++;
+            toExplore.add(index, oldNode);
             robo.makeRotate(180.0);
           }
         } else {
@@ -172,21 +173,24 @@ public class Explorer {
             robo.moveForward(5.0);
           } else {
             Node oldNode = toExplore.get(index);
-            explored.add(oldNode);
+	          oldNode.exploredChildrenCount++;
+	          toExplore.add(index, oldNode);
             robo.makeRotate(180.0);
           }
         }
+        */
       } else if (l <= darkColourThreshold && r <= darkColourThreshold) {
         // both sensors on tape
         int rotateCount = 0;
         while (l < darkColourThreshold) {
           rotateCount++;
           robo.makeRotate(1.0); // might be too small
-          l = robo.getLightValue()[1]; // get new value
+          lightArr = robo.getLightValue();
+	        l = lightArr[1];
         }
+        /*
         if(rotateCount <= 45) {
           // crossroads
-          String name = Integer.toString(++nodeCounter);
           int x = (int) robo.pose.getX();
           int y = (int) robo.pose.getY();
 
@@ -209,25 +213,30 @@ public class Explorer {
             Node oldNode = toExplore.get(index);
             oldNode.exploredChildrenCount++;
 
-            if(oldNode.exploredChildrenCount => oldNode.childrenCount) {
-              explored.add(oldNode);
+            if(oldNode.exploredChildrenCount >= oldNode.childrenCount) {
+              toExplore.add(index, oldNode);
               robo.makeRotate(180.0);
               // backtrack
             } else {
               // find unexplored path
-              Set<double> visited = visited(visited);
-              double directions[] = {0.0, 90.0, 180.0, -90.0};
-              double unexplored = 0.0;
-              for(int i = 0; i < directions; i++) {
-                if(!visited.contains(directions[i])) {
-                  unexplored = directions[i];
-                  break;
-                }
+	             ArrayList<Double> visited = visited(oldNode);
+               double directions[] = {0.0, 90.0, 180.0, -90.0};
+               double unexplored = 0.0;
+               boolean found = false;
+               for(int i = 0; i < visited.size(); i++) {
+	                for(int j = 0; j < directions.length; j++) {
+                    if(visited.get(i) == directions[j]) {
+		                    found = true;
+	                       break;
+		                     }
+                    }
+		                if(!found) {
+		                    unexplored = directions[i];
+		                }
               }
 
               // move to unexplored path
-              robo.pose.setHeading(unexplored);
-
+              robo.pose.setHeading((float) unexplored);
             }
           }
         } else {
@@ -250,17 +259,19 @@ public class Explorer {
             stack.push(newNode);
           } else {
             Node oldNode = toExplore.get(index);
-            explored.add(oldNode);
+            oldNode.exploredChildrenCount++;
+	          toExplore.add(index, oldNode);
             robo.makeRotate(180.0);
           }
         }
+        */
       } else {
         System.out.println("Unknown case");
       }
-    } while (toExplore.size() == explored.size());
+    } while (!exploredAll(toExplore));
   }
 
-  static int previouslyVisitedNode(ArrayList<Node> toExplore, int x, int y) {
+  static public int previouslyVisitedNode(ArrayList<Node> toExplore, int x, int y) {
     for(int i = 0;  i < toExplore.size(); i++) {
       Node curr = toExplore.get(i);
       if(curr.xPos == x && curr.yPos == y) return i;
@@ -268,10 +279,10 @@ public class Explorer {
     return -1;
   }
 
-  static Set<double> visited(Node node) {
+  static public ArrayList<Double> visited(Node node) {
     ArrayList<Node> neighbours = node.children;
     neighbours.add(node.pred);
-    Set<double> explored = new Set<double>();
+    ArrayList<Double> explored = new ArrayList<Double>();
     for(int i = 0; i < neighbours.size(); i++) {
       Node neighbour = neighbours.get(i);
       if(neighbour.xPos > node.xPos) {
@@ -285,6 +296,14 @@ public class Explorer {
       }
     }
     return explored;
+  }
+
+  static public boolean exploredAll(ArrayList<Node> nodeList) {
+   for(int i = 0; i < nodeList.size(); i++) {
+      if(nodeList.get(i).childrenCount != nodeList.get(i).exploredChildrenCount)
+	       return false;
+   }
+   return true;
   }
 
 }

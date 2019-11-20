@@ -30,7 +30,7 @@ class Robot {
   }
 
   public void moveBackward(double distance) {
-    this.pilto.travel(distance*-1.0, true);
+    this.pilot.travel(distance*-1.0, true);
   }
 
   public void moveTo(Node n) {
@@ -51,7 +51,7 @@ class Robot {
   }
 
   public float[] getPose() {
-    return new float[] = {pose.getX, pose.getY};
+    return new float[] {pose.getX(), pose.getY()};
   }
 
 }

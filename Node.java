@@ -10,18 +10,12 @@ class Node {
     public int exploredChildrenCount = 0;
 
     //constructor
-    public Node(String name, int xPos, int yPos, String type, int exploredCounter) {
+    public Node(String name, int xPos, int yPos) {
         this.name = name;
         this.xPos = xPos;
         this.yPos = yPos;
         this.explored = false;
         this.children = new ArrayList<Node>();
-        this.type = type;
-        this.exploredCounter = exploredCounter;
-    }
-
-    public String getType() {
-      return this.type;
     }
 
     public String toString(){
@@ -44,17 +38,5 @@ class Node {
 
     public Boolean equals(Node n) {
 	    return (n.name == this.name) ? true : false;
-    }
-
-    public void setType(String type) {
-      this.type = type;
-    }
-
-    public int getExploredCount() {
-      return this.exploredCounter;
-    }
-
-    public void setExploredCount(int exploredCounter) {
-      this.exploredCounter = exploredCounter;
     }
 }
